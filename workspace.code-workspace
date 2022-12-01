@@ -1,0 +1,20 @@
+{
+    "folders": [
+        {
+            "name": "",
+            "path": "./"
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "*/__pycache__/": true,
+        },
+        "python.analysis.typeCheckingMode": "strict",
+    },
+    "extensions": {
+        "recommendations": [
+            "vscode-icons-team.vscode-icons",
+            "ms-vscode-remote.vscode-remote-extensionpack",
+        ]
+    }
+}
