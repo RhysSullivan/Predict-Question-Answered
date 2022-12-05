@@ -94,15 +94,47 @@ class Posts:
         text = soup.get_text()
         self.text_word_count = len(text.split())
 
+    def print_info(self):
+        print(f"Post ID: {self.id}")
+        print(f"Post Type ID: {self.post_type_id}")
+        print(f"Creation Date: {self.creation_date}")
+        print(f"Score: {self.score}")
+        print(f"Title: {self.title}")
+        print(f"Tags: {self.tags}")
+        print(f"Is Answered: {self.is_answered}")
+        print(f"Number of Code Snippets: {self.num_code_snippets}")
+        print(f"Total Length of Code: {self.total_code_length}")
+        print(f"Number of Images: {self.num_images}")
+        print(f"Text Word Count: {self.text_word_count}")
 
-# Parse the XML file
-# context = ET.iterparse("data/Posts.xml")
-context = ET.iterparse("data-cleaner/sample.xml")
 
-# Iterate over the elements of the XML file
-for event, xml_row in context:
-    # Check if the element is a "row" element
-    if xml_row.tag == "row":
-        # Create a Posts object for each row
-        post = Posts(xml_row)
-        print(post.id, len(post.body), post.tags)
+def parsePosts(file: str, limit: Optional[int]) -> list[Posts]:
+    # Parse the XML file
+    context = ET.iterparse(file)
+    parsed_posts: list[Posts] = []
+
+    # Two seperate loops to not hit the conditional limit
+    if limit:
+        for _event, xml_row in context:
+            if xml_row.tag == "row":
+                try:
+                    parsed_posts.append(Posts(xml_row))
+                    if len(parsed_posts) >= limit:
+                        break
+                except KeyError:
+                    pass
+    else:
+        for _event, xml_row in context:
+            try:
+                parsed_posts.append(Posts(xml_row))
+            except Exception as e:
+                print("Error parsing row", xml_row, e)
+
+    return parsed_posts
+
+
+if __name__ == "__main__":
+    posts = parsePosts("data-cleaner/sample.xml", 1)
+    print(len(posts))
+    for post in posts:
+        post.print_info()
