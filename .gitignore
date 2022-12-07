@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 Posts.xml
+._Posts.xml
+PostHistory.xml
+._PostHistory.xml

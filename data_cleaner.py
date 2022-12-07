@@ -3,7 +3,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 
-class Posts:
+class StackOverflowPost:
     def __init__(self, xml_row: ET.Element) -> None:
         attributes = xml_row.attrib
         self.id: int = int(attributes["Id"])
@@ -94,6 +94,19 @@ class Posts:
         text = soup.get_text()
         self.text_word_count = len(text.split())
 
+    def to_tensor_flow_input(self) -> list[int]:
+        return [
+            self.title_length,
+            self.text_word_count,
+            self.num_code_snippets,
+            self.total_code_length,
+            self.num_images,
+            self.num_tags
+        ]
+
+    def to_tensor_flow_output(self) -> bool:
+        return self.is_answered
+
     def print_info(self):
         print(f"Post ID: {self.id}")
         print(f"Post Type ID: {self.post_type_id}")
@@ -108,17 +121,17 @@ class Posts:
         print(f"Text Word Count: {self.text_word_count}")
 
 
-def parsePosts(file: str, limit: Optional[int]) -> list[Posts]:
+def parsePosts(file: str, limit: Optional[int]) -> list[StackOverflowPost]:
     # Parse the XML file
     context = ET.iterparse(file)
-    parsed_posts: list[Posts] = []
+    parsed_posts: list[StackOverflowPost] = []
 
     # Two seperate loops to not hit the conditional limit
     if limit:
         for _event, xml_row in context:
             if xml_row.tag == "row":
                 try:
-                    parsed_posts.append(Posts(xml_row))
+                    parsed_posts.append(StackOverflowPost(xml_row))
                     if len(parsed_posts) >= limit:
                         break
                 except KeyError:
@@ -126,7 +139,7 @@ def parsePosts(file: str, limit: Optional[int]) -> list[Posts]:
     else:
         for _event, xml_row in context:
             try:
-                parsed_posts.append(Posts(xml_row))
+                parsed_posts.append(StackOverflowPost(xml_row))
             except Exception as e:
                 print("Error parsing row", xml_row, e)
 
@@ -134,7 +147,7 @@ def parsePosts(file: str, limit: Optional[int]) -> list[Posts]:
 
 
 if __name__ == "__main__":
-    posts = parsePosts("data-cleaner/sample.xml", 1)
+    posts = parsePosts("data/sample.xml", 1)
     print(len(posts))
     for post in posts:
         post.print_info()
