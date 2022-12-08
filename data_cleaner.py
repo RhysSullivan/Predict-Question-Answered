@@ -101,7 +101,7 @@ class StackOverflowPost:
             self.num_code_snippets,
             self.total_code_length,
             self.num_images,
-            self.num_tags
+            self.num_tags,
         ]
 
     def to_tensor_flow_output(self) -> bool:
@@ -123,31 +123,34 @@ class StackOverflowPost:
 
 def parsePosts(file: str, limit: Optional[int]) -> list[StackOverflowPost]:
     # Parse the XML file
-    context = ET.iterparse(file)
+    context = ET.iterparse(file, events=('start', 'end'))
     parsed_posts: list[StackOverflowPost] = []
 
-    # Two seperate loops to not hit the conditional limit
-    if limit:
-        for _event, xml_row in context:
-            if xml_row.tag == "row":
-                try:
-                    parsed_posts.append(StackOverflowPost(xml_row))
-                    if len(parsed_posts) >= limit:
-                        break
-                except KeyError:
-                    pass
-    else:
-        for _event, xml_row in context:
+
+    # Track the number of parsed posts
+    num_parsed_posts = 0
+
+    # Iterate over the file in a loop
+    for event, xml_row in context:
+        if event == 'end' and xml_row.tag == "row":
             try:
                 parsed_posts.append(StackOverflowPost(xml_row))
-            except Exception as e:
-                print("Error parsing row", xml_row, e)
+                num_parsed_posts += 1
+
+                # Check if the limit has been reached
+                if limit and num_parsed_posts >= limit:
+                    break
+
+            except KeyError:
+                print('error parsing post', xml_row)
+                pass
 
     return parsed_posts
 
 
 if __name__ == "__main__":
-    posts = parsePosts("data/sample.xml", 1)
+    posts = parsePosts("data/xac", None)
     print(len(posts))
     for post in posts:
+        
         post.print_info()
