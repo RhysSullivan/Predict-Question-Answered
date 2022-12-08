@@ -22,6 +22,14 @@ importances = []
 for i in range(num_inputs):
   importances.append(round((sum(abs(weights_array[i])) / num_outputs), 8)) # Average the absolute values of the weights for this input neuron
 
+print("Not normalized: ".ljust(16), end="")
 # Print the importances
-print("Not normal: " + str(importances).replace(",", "")) # Cleanup output
-print("Normalized: " + str(tf.keras.utils.normalize(importances, axis=-1)[0])) # Normalize and cleanup output
+for important in importances:
+    print(str(important).ljust(12), end="")
+
+print()
+print("Normalized: ".ljust(16), end="")
+# Print the normalized importances
+normalized_importances = tf.keras.utils.normalize(importances, axis=-1)[0]
+for norm_important in normalized_importances:
+    print(str(round(norm_important, 8)).ljust(12), end="")
