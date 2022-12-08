@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 from typing import List, Optional
 from bs4 import BeautifulSoup
-
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from lxml import etree # type: ignore
 
@@ -109,35 +108,23 @@ class StackOverflowPost:
     def to_tensor_flow_output(self) -> bool:
         return self.is_answered
 
-    def print_info(self):
-        print(f"Post ID: {self.id}")
-        print(f"Post Type ID: {self.post_type_id}")
-        print(f"Creation Date: {self.creation_date}")
-        print(f"Score: {self.score}")
-        print(f"Title: {self.title}")
-        print(f"Tags: {self.tags}")
-        print(f"Is Answered: {self.is_answered}")
-        print(f"Number of Code Snippets: {self.num_code_snippets}")
-        print(f"Total Length of Code: {self.total_code_length}")
-        print(f"Number of Images: {self.num_images}")
-        print(f"Text Word Count: {self.text_word_count}")
-
-    def demo(self):
+    def print_metadata(self):
         print(f"Link: https://stackoverflow.com/q/{self.id}")
         print(f"Title Length: {self.title_length}")
-        print(f"Text Word Count: {self.text_word_count}")
+        print(f"Total Word Count: {self.text_word_count}")
         print(f"Number of Code Snippets: {self.num_code_snippets}")
-        print(f"Num Images: {self.num_images}")
-        print(f"Num Tags: {self.num_tags}")
+        print(f"Total Code Length: {self.total_code_length}")
+        print(f"Number of Images: {self.num_images}")
+        print(f"Number of Tags: {self.num_tags}")
 
 
-def parsePosts(files: list[str], limit: Optional[int]) -> list[StackOverflowPost]:
+def parsePosts(files: list[str]) -> list[StackOverflowPost]:
     parsed_posts: list[StackOverflowPost] = []
 
     # Use a ThreadPoolExecutor to process the files in parallel
     with ThreadPoolExecutor(max_workers=16) as executor:
         # Submit a task to parse each file
-        tasks = [executor.submit(parseFile, file, limit) for file in files]        
+        tasks = [executor.submit(parseFile, file) for file in files]        
         # Iterate over the completed tasks and add their results to the parsed_posts deque
         for task in as_completed(tasks):
             try:
@@ -147,7 +134,7 @@ def parsePosts(files: list[str], limit: Optional[int]) -> list[StackOverflowPost
 
     return parsed_posts
 
-def parseFile(file: str, limit: Optional[int]) -> List[StackOverflowPost]:
+def parseFile(file: str) -> list[StackOverflowPost]:
     print(f"Parsing {file}...")
     # Parse the XML file using lxml
     parsed_posts: list[StackOverflowPost] = []
@@ -162,7 +149,6 @@ def parseFile(file: str, limit: Optional[int]) -> List[StackOverflowPost]:
             if event == 'end' and xml_row.tag == "row":
                 try:
                     parsed_posts.append(StackOverflowPost(xml_row))
-                    # print(file, parsed_posts[len(parsed_posts)-1].id)
                     num_parsed_posts += 1
 
                 except Exception as e:
@@ -174,7 +160,7 @@ def parseFile(file: str, limit: Optional[int]) -> List[StackOverflowPost]:
         print(f"Error parsing {file}", e)
         return parsed_posts
 
-def parseChunkedPosts():
+def parseChunkedPosts() -> list[StackOverflowPost]:
     files = [chr(i) for i in range(ord('a'), ord('p') + 1)]
     posts =  parsePosts([f"data/dataset/xa{ltr}" for ltr in files], None)
     print('Parsed', len(posts))
@@ -189,6 +175,3 @@ def parseChunkedPosts():
     print('Unsolved', unsolved_posts)
     print('Solved to unsolved ratio', solved_posts / unsolved_posts)
     return posts
-
-if __name__ == "__main__":
-    parseChunkedPosts()
