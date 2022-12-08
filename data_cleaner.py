@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from typing import List, Optional
+from typing import Optional
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from lxml import etree # type: ignore
@@ -140,16 +140,13 @@ def parseFile(file: str) -> list[StackOverflowPost]:
     parsed_posts: list[StackOverflowPost] = []
     try:
         context = etree.iterparse(file, events=('start', 'end'))
-
-        # Track the number of parsed posts
-        num_parsed_posts = 0
-
         # Iterate over the file in a loop
         for event, xml_row in context:
             if event == 'end' and xml_row.tag == "row":
                 try:
-                    parsed_posts.append(StackOverflowPost(xml_row))
-                    num_parsed_posts += 1
+                    post = StackOverflowPost(xml_row)
+                    if post.post_type_id == 1:
+                        parsed_posts.append(post)
 
                 except Exception as e:
                     print("Error parsing row", e)
@@ -162,7 +159,7 @@ def parseFile(file: str) -> list[StackOverflowPost]:
 
 def parseChunkedPosts() -> list[StackOverflowPost]:
     files = [chr(i) for i in range(ord('a'), ord('p') + 1)]
-    posts =  parsePosts([f"data/dataset/xa{ltr}" for ltr in files], None)
+    posts =  parsePosts([f"data/dataset/xa{ltr}" for ltr in files])
     print('Parsed', len(posts))
     unsolved_posts = 0
     solved_posts = 0
