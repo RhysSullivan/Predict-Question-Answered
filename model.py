@@ -13,7 +13,6 @@ MODEL_FILE_NAME = f"model_{TRAIN_SIZE}_{TEST_SIZE}_{HIDDEN_LAYER_STRUCTURE}.h5"
 TensorFlowInputType = list[int]
 TensorFlowOutputType = bool
 
-
 # Credit: https://www.tensorflow.org/tutorials/quickstart/beginner
 class TensorFlowModel():
 
@@ -54,6 +53,13 @@ class TensorFlowModel():
     def validate(self, input: TensorFlowInputType, output: TensorFlowOutputType) -> bool:
         return self.predict(input) == output
 
+    def weights(self) -> list[list[float]]:
+        return self.model.weights[0].numpy() # Get the weights of the input layer as an array
+
+    def importances(self, normalized: bool = False) -> list[float]:
+        weights = self.weights()
+        importances = [(sum(abs(weights[i])) / len(weights[i])) for i in range(INPUT_PARAMETER_COUNT)] # Average the absolute values of the weights for each input neuron
+        return importances if not normalized else tf.keras.utils.normalize(importances, axis=-1)[0]
 
 if __name__ == "__main__":
     dataset: list[StackOverflowPost] = parseChunkedPosts()

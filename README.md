@@ -8,7 +8,7 @@ A TensorFlow neural network that evaluates the effectiveness of Stack Overflow q
 
 ## Run Instructions
 1. Run `python model.py` to generate a model
-2. Run `python predict.py [model_filename]` to run predictions using sample data
+2. Run `python predict.py [model_filename]` to run predictions using test data
 2. Run `python importance.py [model_filename]` to see the importance of each metadata parameter
 
 ## Team Members
