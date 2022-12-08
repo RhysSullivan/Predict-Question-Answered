@@ -120,6 +120,14 @@ class StackOverflowPost:
         print(f"Number of Images: {self.num_images}")
         print(f"Text Word Count: {self.text_word_count}")
 
+    def demo(self):
+        print(f"Link: https://stackoverflow.com/q/{self.id}")
+        print(f"Title Length: {self.title_length}")
+        print(f"Text Word Count: {self.text_word_count}")
+        print(f"Number of Code Snippets: {self.num_code_snippets}")
+        print(f"Num Images: {self.num_images}")
+        print(f"Num Tags: {self.num_tags}")
+
 
 def parsePosts(file: str, limit: Optional[int]) -> list[StackOverflowPost]:
     # Parse the XML file
