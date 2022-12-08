@@ -128,7 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-Posts.xml
-._Posts.xml
-PostHistory.xml
-._PostHistory.xml
+data/dataset
