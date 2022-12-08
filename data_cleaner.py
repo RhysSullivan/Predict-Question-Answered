@@ -176,14 +176,7 @@ def parseFile(file: str, limit: Optional[int]) -> List[StackOverflowPost]:
 
 def parseChunkedPosts():
     files = [chr(i) for i in range(ord('a'), ord('p') + 1)]
-    return parsePosts([f"data/dataset/xa{ltr}" for ltr in files], None)
-
-if __name__ == "__main__":
-    # make an array of strings from a to p
-    files = [chr(i) for i in range(ord('a'), ord('p') + 1)]
-    
-    posts = parsePosts([f"data/dataset/xa{ltr}" for ltr in files], None)
-    
+    posts =  parsePosts([f"data/dataset/xa{ltr}" for ltr in files], None)
     print('Parsed', len(posts))
     unsolved_posts = 0
     solved_posts = 0
@@ -195,3 +188,7 @@ if __name__ == "__main__":
     print('Solved', solved_posts)
     print('Unsolved', unsolved_posts)
     print('Solved to unsolved ratio', solved_posts / unsolved_posts)
+    return posts
+
+if __name__ == "__main__":
+    parseChunkedPosts()

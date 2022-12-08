@@ -1,17 +1,18 @@
 from __future__ import annotations
 import tensorflow as tf
 import numpy as np
-from data_cleaner import StackOverflowPost, parsePosts
+from data_cleaner import StackOverflowPost, parseChunkedPosts, parseFile
 
 TensorFlowInputType = list[int]
 TensorFlowOutputType = bool
 
 DATASET_FILE_NAME = "data/sample.xml" # "data/Post.xml"
-MODEL_FILE_NAME = "model.h5"
 INPUT_PARAMETER_COUNT = 6
-HIDDEN_LAYER_STRUCTURE = [5]
-TRAIN_SIZE = 3
-TEST_SIZE = 2
+HIDDEN_LAYER_STRUCTURE = [3, 5]
+TOTAL_SIZE = 1400000
+TEST_SIZE = TOTAL_SIZE // 10
+TRAIN_SIZE = TOTAL_SIZE - TEST_SIZE
+MODEL_FILE_NAME = f"model_{TRAIN_SIZE}_{TEST_SIZE}_{HIDDEN_LAYER_STRUCTURE}.h5"
 
 
 # Credit: https://www.tensorflow.org/tutorials/quickstart/beginner
@@ -58,7 +59,7 @@ class TensorFlowModel():
 
 
 if __name__ == "__main__":
-    dataset: list[StackOverflowPost] = parsePosts(DATASET_FILE_NAME, TRAIN_SIZE + TEST_SIZE)
+    dataset: list[StackOverflowPost] = parseChunkedPosts()
     input_all: list[TensorFlowInputType] = [post.to_tensor_flow_input() for post in dataset]
     output_all: list[TensorFlowOutputType] = [post.to_tensor_flow_output() for post in dataset]
 
