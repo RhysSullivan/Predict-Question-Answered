@@ -18,18 +18,27 @@ for i in range(num_inputs):
 
 
 # Importance of each input
+spacing = 28
 importances = []
 for i in range(num_inputs):
   importances.append(round((sum(abs(weights_array[i])) / num_outputs), 8)) # Average the absolute values of the weights for this input neuron
 
-print("Not normalized: ".ljust(16), end="")
-# Print the importances
-for important in importances:
-    print(str(important).ljust(12), end="")
+# Print results
+print()
+print("Labels: ".ljust(spacing), end="")
+labels = ["Title Length", "Total Word Count", "Number of Code Snippets", "Total Code Length", "Number of Images", "Number of Tags"]
+for label in labels:
+    print(label.ljust(spacing), end="")
 
 print()
-print("Normalized: ".ljust(16), end="")
+print("Not normalized: ".ljust(spacing), end="")
+# Print the importances
+for important in importances:
+    print(str(important).ljust(spacing), end="")
+
+print()
+print("Normalized: ".ljust(spacing), end="")
 # Print the normalized importances
 normalized_importances = tf.keras.utils.normalize(importances, axis=-1)[0]
 for norm_important in normalized_importances:
-    print(str(round(norm_important, 8)).ljust(12), end="")
+    print(str(round(norm_important, 8)).ljust(spacing), end="")
