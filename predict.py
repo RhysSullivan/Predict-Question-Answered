@@ -2,7 +2,7 @@ from data_cleaner import StackOverflowPost, parsePosts
 from model import TensorFlowModel
 
 if __name__ == "__main__":
-    posts: list[StackOverflowPost] = parsePosts("data/sample.xml", 5)
+    posts: list[StackOverflowPost] = parsePosts(["data/sample.xml"], 5)
     model = TensorFlowModel.from_filename("model.h5")
 
     for i in range(len(posts)):
