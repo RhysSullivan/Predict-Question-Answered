@@ -1,2 +1,4 @@
+tensorflow
+numpy
 beautifulsoup4
 lxml
