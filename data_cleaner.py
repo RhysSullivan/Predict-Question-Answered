@@ -1,7 +1,9 @@
 import xml.etree.ElementTree as ET
-from typing import Optional
+from typing import List, Optional
 from bs4 import BeautifulSoup
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from lxml import etree # type: ignore
 
 class StackOverflowPost:
     def __init__(self, xml_row: ET.Element) -> None:
@@ -121,36 +123,67 @@ class StackOverflowPost:
         print(f"Text Word Count: {self.text_word_count}")
 
 
-def parsePosts(file: str, limit: Optional[int]) -> list[StackOverflowPost]:
-    # Parse the XML file
-    context = ET.iterparse(file, events=('start', 'end'))
+def parsePosts(files: list[str], limit: Optional[int]) -> list[StackOverflowPost]:
     parsed_posts: list[StackOverflowPost] = []
 
-
-    # Track the number of parsed posts
-    num_parsed_posts = 0
-
-    # Iterate over the file in a loop
-    for event, xml_row in context:
-        if event == 'end' and xml_row.tag == "row":
+    # Use a ThreadPoolExecutor to process the files in parallel
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        # Submit a task to parse each file
+        tasks = [executor.submit(parseFile, file, limit) for file in files]        
+        # Iterate over the completed tasks and add their results to the parsed_posts deque
+        for task in as_completed(tasks):
             try:
-                parsed_posts.append(StackOverflowPost(xml_row))
-                num_parsed_posts += 1
-
-                # Check if the limit has been reached
-                if limit and num_parsed_posts >= limit:
-                    break
-
-            except KeyError:
-                print('error parsing post', xml_row)
-                pass
+                parsed_posts.extend(task.result())
+            except:
+                print(f"Error parsing file {task}")
 
     return parsed_posts
 
+def parseFile(file: str, limit: Optional[int]) -> List[StackOverflowPost]:
+    print(f"Parsing {file}...")
+    # Parse the XML file using lxml
+    parsed_posts: list[StackOverflowPost] = []
+    try:
+        context = etree.iterparse(file, events=('start', 'end'))
+
+        # Track the number of parsed posts
+        num_parsed_posts = 0
+
+        # Iterate over the file in a loop
+        for event, xml_row in context:
+            if event == 'end' and xml_row.tag == "row":
+                try:
+                    parsed_posts.append(StackOverflowPost(xml_row))
+                    # print(file, parsed_posts[len(parsed_posts)-1].id)
+                    num_parsed_posts += 1
+
+                except Exception as e:
+                    print("Error parsing row", e)
+                    pass
+
+        return parsed_posts
+    except Exception as e:
+        print(f"Error parsing {file}", e)
+        return parsed_posts
+
+def parseChunkedPosts():
+    files = [chr(i) for i in range(ord('a'), ord('p') + 1)]
+    return parsePosts([f"data/split/xa{ltr}" for ltr in files], None)
 
 if __name__ == "__main__":
-    posts = parsePosts("data/xac", None)
-    print(len(posts))
+    # make an array of strings from a to p
+    files = [chr(i) for i in range(ord('a'), ord('p') + 1)]
+    
+    posts = parsePosts([f"data/split/xa{ltr}" for ltr in files], None)
+    
+    print('Parsed', len(posts))
+    unsolved_posts = 0
+    solved_posts = 0
     for post in posts:
-        
-        post.print_info()
+        if post.is_answered:
+            solved_posts += 1
+        else:
+            unsolved_posts += 1
+    print('Solved', solved_posts)
+    print('Unsolved', unsolved_posts)
+    print('Solved to unsolved ratio', solved_posts / unsolved_posts)
