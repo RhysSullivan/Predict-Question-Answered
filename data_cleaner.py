@@ -100,7 +100,7 @@ class StackOverflowPost:
         return f"https://stackoverflow.com/q/{self.id}"
 
     def to_tensor_flow_input(self) -> list[int]:
-        return [
+        inputs = [
             self.title_length,
             self.text_word_count,
             self.num_code_snippets,
@@ -108,6 +108,7 @@ class StackOverflowPost:
             self.num_images,
             self.num_tags,
         ]
+        return [(float(i) / sum(inputs)) for i in inputs]
 
     def to_tensor_flow_output(self) -> bool:
         return self.is_answered
