@@ -1,5 +1,5 @@
 # Predict Question Answered
-A TensorFlow neural network that evaluates the effectiveness of Stack Overflow questions using metadata. Given the Title Length, Total Word Count, Number of Code Snippets, Total Code Length, Number of Images, and Number of Tags, this model can predict if the question will receive an accepted answer with ~85% accuracy.
+A TensorFlow neural network that evaluates the effectiveness of Stack Overflow questions using metadata. Given the Title Length, Total Word Count, Number of Code Snippets, Total Code Length, Number of Images, and Number of Tags, this model can predict if the question will receive an accepted answer with ~70% accuracy.
 
 ## Setup Instructions
 1. Run `./dependencies.sh` to install the required dependencies

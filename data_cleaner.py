@@ -95,6 +95,10 @@ class StackOverflowPost:
         text = soup.get_text()
         self.text_word_count = len(text.split())
 
+    @property
+    def link(self) -> str:
+        return f"https://stackoverflow.com/q/{self.id}"
+
     def to_tensor_flow_input(self) -> list[int]:
         return [
             self.title_length,
@@ -109,7 +113,6 @@ class StackOverflowPost:
         return self.is_answered
 
     def print_metadata(self):
-        print(f"Link: https://stackoverflow.com/q/{self.id}")
         print(f"Title Length: {self.title_length}")
         print(f"Total Word Count: {self.text_word_count}")
         print(f"Number of Code Snippets: {self.num_code_snippets}")
@@ -145,7 +148,7 @@ def parseFile(file: str) -> list[StackOverflowPost]:
             if event == 'end' and xml_row.tag == "row":
                 try:
                     post = StackOverflowPost(xml_row)
-                    if post.post_type_id == 1:
+                    if post.post_type_id == 1: # only use questions from the dataset
                         parsed_posts.append(post)
 
                 except Exception as e:

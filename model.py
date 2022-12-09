@@ -5,7 +5,7 @@ from data_cleaner import StackOverflowPost, parseChunkedPosts
 
 INPUT_PARAMETER_COUNT = 6
 HIDDEN_LAYER_STRUCTURE = [11, 8]
-TOTAL_SIZE = 1400000
+TOTAL_SIZE = 515817
 TEST_SIZE = TOTAL_SIZE // 10
 TRAIN_SIZE = TOTAL_SIZE - TEST_SIZE
 MODEL_FILE_NAME = f"model_{TRAIN_SIZE}_{TEST_SIZE}_{HIDDEN_LAYER_STRUCTURE}.h5"
@@ -50,15 +50,20 @@ class TensorFlowModel():
         result: float = self.model.predict(np.array([input]))[0][0] # value between [0, 1]
         return bool(round(result))
 
+    def predict_with_confidence_score(self, input: TensorFlowInputType) -> tuple(TensorFlowOutputType, float):
+        result: float = self.model.predict(np.array([input]))[0][0] # value between [0, 1]
+        prediction = bool(round(result))
+        return (True, result) if prediction else (False, 1 - result)
+
     def validate(self, input: TensorFlowInputType, output: TensorFlowOutputType) -> bool:
         return self.predict(input) == output
 
     def weights(self) -> list[list[float]]:
-        return self.model.weights[0].numpy() # Get the weights of the input layer as an array
+        return self.model.weights[0].numpy() # weights of the input layer as an array
 
     def importances(self, normalized: bool = False) -> list[float]:
         weights = self.weights()
-        importances = [(sum(abs(weights[i])) / len(weights[i])) for i in range(INPUT_PARAMETER_COUNT)] # Average the absolute values of the weights for each input neuron
+        importances = [(sum(abs(weights[i])) / len(weights[i])) for i in range(INPUT_PARAMETER_COUNT)] # average the absolute values of the weights for each input neuron
         return importances if not normalized else tf.keras.utils.normalize(importances, axis=-1)[0]
 
 if __name__ == "__main__":
