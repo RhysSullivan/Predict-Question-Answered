@@ -10,7 +10,7 @@ TEST_SIZE = TOTAL_SIZE // 10
 TRAIN_SIZE = TOTAL_SIZE - TEST_SIZE
 MODEL_FILE_NAME = f"model_{TRAIN_SIZE}_{TEST_SIZE}_{HIDDEN_LAYER_STRUCTURE}.h5"
 
-TensorFlowInputType = list[int]
+TensorFlowInputType = list[float]
 TensorFlowOutputType = bool
 
 # Credit: https://www.tensorflow.org/tutorials/quickstart/beginner

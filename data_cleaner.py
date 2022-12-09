@@ -99,14 +99,14 @@ class StackOverflowPost:
     def link(self) -> str:
         return f"https://stackoverflow.com/q/{self.id}"
 
-    def to_tensor_flow_input(self) -> list[int]:
+    def to_tensor_flow_input(self) -> list[float]:
         inputs = [
             self.title_length,
             self.text_word_count,
             self.num_code_snippets,
             self.total_code_length,
             self.num_images,
-            self.num_tags,
+            self.num_tags
         ]
         return [(float(i) / sum(inputs)) for i in inputs]
 
